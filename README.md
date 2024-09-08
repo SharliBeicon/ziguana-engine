@@ -1,5 +1,5 @@
 <div style="text-align: center;">
-    <pre style="color: orange;">
+    <pre style="align: center;">
        ////////   //        ////    //    //   ////////   //     //   ////////
            //     //      //        //    //   //    //   ///    //   //    //
          //       //     //  ////   //    //   ////////   // //  //   ////////
