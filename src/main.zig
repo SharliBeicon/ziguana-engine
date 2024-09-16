@@ -1,6 +1,7 @@
 const std = @import("std");
 const LogLevel = @import("managers/log.zig").LogLevel;
 const Ziguana = @import("root.zig").Ziguana;
+const create_heap = @import("root.zig").create_heap;
 const Vector = @import("assets/vector.zig").Vector;
 const obj = @import("assets/object.zig");
 pub fn main() !void {
@@ -15,22 +16,25 @@ pub fn main() !void {
     var object_list2 = try obj.ObjectList.new();
     defer object_list2.deinit();
 
+    var allocator = std.heap.page_allocator;
+
     const start = std.time.nanoTimestamp();
 
-    var object1 = obj.Object.new();
-    var object2 = obj.Object.new();
-    var object3 = obj.Object.new();
-    var object4 = obj.Object.new();
-    var object5 = obj.Object.new();
-    var object6 = obj.Object.new();
+    var id_counter: u32 = 0;
+    while (id_counter < 1_000_000) : (id_counter += 1) {
+        const object = try allocator.create(obj.Object);
+        object.* = obj.Object.new();
 
-    try object_list1.insert(&object1);
-    try object_list1.insert(&object2);
-    try object_list1.insert(&object3);
+        try object_list1.insert(object);
+    }
 
-    try object_list2.insert(&object4);
-    try object_list2.insert(&object5);
-    try object_list2.insert(&object6);
+    id_counter = 0;
+    while (id_counter < 1_000_000) : (id_counter += 1) {
+        const object = try allocator.create(obj.Object);
+        object.* = obj.Object.new();
+
+        try object_list2.insert(object);
+    }
 
     try object_list1.push_list(&object_list2);
 

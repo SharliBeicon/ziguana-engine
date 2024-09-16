@@ -23,19 +23,25 @@ pub const ObjectList = struct {
     allocator: std.mem.Allocator,
 
     pub fn new() !ObjectList {
-        var object_list = ObjectList{ .objects = undefined, .count = 0, .size = 1, .allocator = std.heap.page_allocator };
-        object_list.objects = try object_list.allocator.alloc(*Object, 1);
+        var object_list = ObjectList{ .objects = undefined, .count = 0, .size = 20, .allocator = std.heap.page_allocator };
+        object_list.objects = try object_list.allocator.alloc(*Object, object_list.size);
 
         return object_list;
     }
 
     pub fn deinit(self: *ObjectList) void {
+        var iter = self.iterator();
+        while (!iter.done()) : (iter.next()) {
+            const obj = iter.current() orelse break;
+            self.allocator.destroy(obj);
+        }
+
         self.allocator.free(self.objects);
     }
 
     pub fn insert(self: *ObjectList, object: *Object) !void {
         if (self.count == self.size) {
-            self.size += 1;
+            self.size *= 2;
             self.objects = try self.allocator.realloc(self.objects, self.size);
         }
 
@@ -48,7 +54,7 @@ pub const ObjectList = struct {
 
         var iter = list.iterator();
         while (!iter.done()) : (iter.next()) {
-            self.objects[self.count] = iter.current().?;
+            self.objects[self.count] = iter.current() orelse break;
             self.count += 1;
         }
     }
