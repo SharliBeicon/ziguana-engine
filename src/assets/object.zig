@@ -5,7 +5,7 @@ var id_counter: u32 = 0;
 
 pub const Object = struct {
     id: u32,
-    type: [*]const u8,
+    type: []const u8,
     position: Vector,
 
     pub fn new() Object {
@@ -60,9 +60,9 @@ pub const ObjectList = struct {
     }
 
     pub fn remove(self: *ObjectList, object: *Object) bool {
-        for (self.objects) |obj| {
-            if (obj == object) {
-                obj = self.objects[self.count - 1];
+        for (self.objects) |*obj| {
+            if (obj.* == object) {
+                obj.* = self.objects[self.count - 1];
                 self.count -= 1;
 
                 return true;

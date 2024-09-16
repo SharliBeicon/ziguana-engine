@@ -1,26 +1,29 @@
 const std = @import("std");
-const Logger = @import("managers/log.zig").Logger;
+const log = @import("managers/log.zig");
+const world = @import("managers/world.zig");
+const obj = @import("assets/object.zig");
 const Clock = @import("util/clock.zig").Clock;
 
 const FRAME_TIME = 16_666_666; // 60 FPS
 
 pub const Ziguana = struct {
-    logger: Logger,
+    logger: log.Logger,
+    world: world.World,
 
     game_over: bool,
 
     pub fn new() Ziguana {
-        return Ziguana{ .logger = Logger.new(), .game_over = false };
+        return Ziguana{ .logger = log.Logger.new(), .world = world.World.new(), .game_over = false };
     }
 
     pub fn init(self: *Ziguana) !void {
-        _ = try self.logger.init();
+        try self.logger.init();
+        try self.world.init();
     }
 
-    pub fn run(self: *Ziguana) void {
+    pub fn run(self: *Ziguana) !void {
         var adjust_time: i128 = 0;
         var clock = Clock.new();
-
         while (!self.game_over) {
             _ = clock.delta();
 
@@ -42,6 +45,9 @@ pub const Ziguana = struct {
     }
 
     pub fn close(self: *Ziguana) void {
+        self.game_over = true;
+
         self.logger.close();
+        self.world.close();
     }
 };
